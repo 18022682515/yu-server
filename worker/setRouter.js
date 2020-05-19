@@ -26,7 +26,7 @@ function setRouter(controllers,config,router){
 				Object.keys(prefix).forEach(attr=>{
 					if(!prefix[attr].includes(key)) return
 					
-					childs[attr].get('/',controller['index']);
+					controller['index'] && childs[attr].get('/',controller['index']);
 					fnNames.forEach(fnName=>{
 						if(getType(controller[fnName])!=='AsyncFunction') return;
 						childs[attr].all(`/${fnName}`,controller[fnName])
@@ -35,7 +35,7 @@ function setRouter(controllers,config,router){
 				return
 			}
 			
-			router.get('/',controller['index']);
+			controller['index'] && router.get('/',controller['index']);
 			fnNames.forEach(fnName=>{
 					if(getType(controller[fnName])!=='AsyncFunction') return;
 					router.all(`/${fnName}`,controller[fnName]);
