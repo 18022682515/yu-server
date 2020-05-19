@@ -16,6 +16,7 @@ const createApp = require('./createApp.js');
 const { getControllers } = require('./getAll.js');
 const catchError = require('./middleware/catchError.js');
 const log = require('./middleware/log.js');
+const setRouter = require('./setRouter.js');
 
 module.exports = function(root,config,loggerApp,loggerRequest){
     const app = createApp(new Koa());
@@ -50,29 +51,14 @@ module.exports = function(root,config,loggerApp,loggerRequest){
         if(!/function/i.test(getType(middleware))) return;
         app.use(middleware);
     });
-
-    app.use( static(path.join(root,config.static),{ index:false,path:path.resolve(root,config.static) }) );
-    app.use( router.routes() ).use( router.allowedMethods() );
+		
+		app.use( static(path.join(root,config.static),{ index:false,path:path.resolve(root,config.static) }) );
+		app.use( router.routes() ).use( router.allowedMethods() );
+    
     render(app,{ root:path.join(root,config.view),layout:false,viewExt:"html",cache:false,debug:false });
     
     let controllers = getControllers(path.join(root,'controller'));
-    Object.keys(controllers).forEach(key=>{
-        controller = controllers[key];
-        if(getType(controller)!=='Object') return;
-        const fnNames = Object.getOwnPropertyNames(controller.__proto__).filter(val=>{
-            return val !== 'constructor';
-        });
-        if(fnNames.length<1) return;
-        router.get('/',controller['index']);
-        fnNames.forEach(fnName=>{
-            if(getType(controller[fnName])!=='AsyncFunction') return;
-            router.all(`/${fnName}`,controller[fnName]);
-        });
-    });
-    router.all('*',async ctx=>{
-        ctx.status = 404;
-        await ctx.render('404');
-    });
+		setRouter(controllers,config,router)
     
     config.https = getType(config.https)==="Object"? config.https: {};
     let keyPath = config.https.key||path.resolve(__dirname,'../server.key');
@@ -82,12 +68,12 @@ module.exports = function(root,config,loggerApp,loggerRequest){
         cert:fs.readFileSync(certPath)
     }
 
-    const servers = {};
-    if(config.http && config.http.port) servers.Http = http.createServer(app.callback()).listen(config.http.port,()=>{
+    const server = {};
+    if(config.http && config.http.port) server.Http = http.createServer(app.callback()).listen(config.http.port,()=>{
         console.log(`开启http://localhost:${config.http.port}端口`);
     });
-    if(config.https.port) servers.Https = https.createServer(optionsHttps,app.callback()).listen(config.https.port,()=>{
+    if(config.https.port) server.Https = https.createServer(optionsHttps,app.callback()).listen(config.https.port,()=>{
         console.log(`开启https://127.0.0.1:${config.https.port}端口`);
     });
-    return servers;
+    return server;
 }
