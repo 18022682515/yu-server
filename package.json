@@ -1,10 +1,10 @@
 {
   "name": "yu-server",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "description": "koa服务器",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "dev": "node index.js"
   },
   "author": "邓小宇",
   "license": "ISC",
