@@ -11,12 +11,11 @@ const { getType } = require('yu-util');
 const session = require('./middleware/session.js');
 const setToken = require('./middleware/setToken.js');
 const rewriteRender = require('./middleware/rewriteRender.js');
-const createApp = require('./createApp.js');
 const catchError = require('./middleware/catchError.js');
 const log = require('./middleware/log.js');
 
 module.exports = function(root, config, loggerApp, loggerRequest) {
-	const app = createApp(new Koa());
+	global.app = new Koa();
 	const router = new koaRouter();
 	app.logger = loggerApp;
 	app.keys = config.keys || ['ab1234cd1xsdfgf22qe3eg31fg'];
@@ -74,13 +73,14 @@ module.exports = function(root, config, loggerApp, loggerRequest) {
 		key: fs.readFileSync(keyPath),
 		cert: fs.readFileSync(certPath)
 	}
-
-	const server = {};
-	if (config.http && config.http.port) server.Http = http.createServer(app.callback()).listen(config.http.port, () => {
+	
+	const servers = {}
+	if (config.http && config.http.port) servers.http = http.createServer(app.callback()).listen(config.http.port, () => {
 		console.log(`开启http://localhost:${config.http.port}端口`);
 	});
-	if (config.https.port) server.Https = https.createServer(optionsHttps, app.callback()).listen(config.https.port, () => {
+	if (config.https.port) servers.https = https.createServer(optionsHttps, app.callback()).listen(config.https.port, () => {
 		console.log(`开启https://127.0.0.1:${config.https.port}端口`);
 	});
-	return server;
+	
+	return servers;
 }
