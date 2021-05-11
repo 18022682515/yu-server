@@ -15,7 +15,7 @@ module.exports = (options,redis) => {
 			if(!redis){
 				app.context[session_id] = {
 					//服务器自动清理过期session_id对象，以下是session_id对象的有效期
-					maxAge: options.maxAge ? Date.now()+options.maxAge : Date.now()+8*60*60*1000
+					maxAge: options.maxAge ? Date.now()+options.maxAge : Date.now()+24*60*60*1000
 				};
 			}
 		}
@@ -27,7 +27,7 @@ module.exports = (options,redis) => {
 
 
 function setCookies(ctx, keyName, session_id, options) {
-	options.maxAge = options.maxAge || 8 * 60 * 60 * 1000; // cookie有效时长
+	options.maxAge = options.maxAge || 24 * 60 * 60 * 1000; // cookie有效时长
 	options.path = options.path || '/'; // 该cookie所在的路径
 	options.httpOnly = options.httpOnly || false; // 前端js是否可以访问cookie
 	options.overwrite = options.overwrite || true; // 如果设置两个相同的key名，是否后者覆盖前者

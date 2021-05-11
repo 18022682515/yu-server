@@ -16,7 +16,7 @@ class RedisSession{
 	
 	get(key){
 		return new Promise((resolve,reject)=>{
-			this.redis.hmget(this.session_id,key,(err,result)=>{
+			this.redis.hget(this.session_id,key,(err,result)=>{
 				if(err) return reject(err);
 				resolve(result);
 			})
@@ -35,7 +35,7 @@ class RedisSession{
 
 
 module.exports = function getRedisSession(redis,session_id){
-	redis.expire(session_id,60*60*8)				//设置redis的key有效时间(8小时)
+	redis.expire(session_id,60*60*24)				//设置redis的key有效时间(24小时)
 	
 	return new RedisSession(redis,session_id)
 }

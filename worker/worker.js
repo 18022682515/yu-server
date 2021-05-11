@@ -17,7 +17,7 @@ module.exports = function(root) {
 		
 		const config = require(path.join(root, 'config.js'));
 		const servers = runServer(root, config, loggerApp, loggerRequest);
-		const mysql = runMysql(config.mysql);
+		const mysql = config.mysql ? runMysql(config.mysql) :null;
 		const tasks = runTasks(root);
 		addAppProperty({ servers,mysql,tasks,'cache':{} });
 		
