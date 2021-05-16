@@ -3,8 +3,8 @@ module.exports = options=>{
         let render = ctx.render;
         ctx.render = async function(view,_context){
             _context = _context || {};
-            _context._csrf = ctx.session.get('_csrf');
-            await render.call(ctx,view,_context);
+            _context._csrf = await ctx.session.get('_csrf');
+            return render.call(ctx,view,_context);
         }
         return next();
     }
