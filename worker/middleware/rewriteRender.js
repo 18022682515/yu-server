@@ -3,7 +3,7 @@ module.exports = options=>{
         let render = ctx.render;
         ctx.render = async function(view,_context){
             _context = _context || {};
-            _context._csrf = ctx.session._csrf;
+            _context._csrf = ctx.session.get('_csrf');
             await render.call(ctx,view,_context);
         }
         return next();

@@ -2,11 +2,11 @@ const crypto = require('crypto');
 
 module.exports = options=>{
     return async (ctx,next)=>{
-        if(ctx.session._csrf) return next();
+        if(ctx.session.get('_csrf')) return next();
         let hash = crypto.createHash('md5');
         hash.update(`${Date.now()}`);
         let token = hash.digest('hex');
-        ctx.session._csrf = token;
+        ctx.session.set('_csrf',token);
         ctx.cookies.set('_csrf',token,{
             maxAge: 1000*60*60*24, // cookie有效时长
             path: '/',       // 该cookie生效的路径
