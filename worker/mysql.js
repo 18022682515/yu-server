@@ -19,6 +19,7 @@ module.exports = options => {
 					//释放本连接
 					connection.release();
 					if (error) {
+						app.logger.warn(err);
 						rej(error);
 					} else {
 						res(data);

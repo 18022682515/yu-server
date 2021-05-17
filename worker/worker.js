@@ -8,15 +8,12 @@ const addAppProperty = require('./addAppProperty.js');
 
 module.exports = function(root) {
 	return new Promise(res=>{
-		const {
-			loggerApp,
-			loggerRequest
-		} = runLog(root, '工作进程');
+		const { appLogger,requestLogger } = runLog(root, '工作进程');
 		
-		loggerApp.info('启动');
+		appLogger.info('启动');
 		
 		const config = require(path.join(root, 'config.js'));
-		const servers = runServer(root, config, loggerApp, loggerRequest);
+		const servers = runServer(root, config, appLogger,requestLogger);
 		const mysql = config.mysql ? runMysql(config.mysql) :null;
 		const tasks = runTasks(root);
 		addAppProperty({ servers,mysql,tasks,'cache':{} });

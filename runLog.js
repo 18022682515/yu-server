@@ -1,33 +1,84 @@
 const log4js = require('log4js');
 const path = require('path');
 
+function getDate(){
+	let dateTime = new Date();
+	let year = dateTime.getFullYear();
+	let month = dateTime.getMonth()+1;
+	let date = dateTime.getDate();
+	return year+'-'+month+'-'+date;
+}
+
 module.exports = (root,name)=>{
     log4js.configure({
         appenders:{
-            app:{ 
+						'app-error':{
+						    type: 'dateFile',  
+						    filename: path.join(root,'logs',getDate(),'app','error'), 
+						    pattern: 'log',  // 文件名增加后缀 
+						    alwaysIncludePattern: true   // 是否总是有后缀名 
+						},
+						'app-warn':{
+						    type: 'dateFile',  
+						    filename: path.join(root,'logs',getDate(),'app','warn'), 
+						    pattern: 'log',  // 文件名增加后缀 
+						    alwaysIncludePattern: true   // 是否总是有后缀名 
+						},
+						'app-info':{
+						    type: 'dateFile',  
+						    filename: path.join(root,'logs',getDate(),'app','info'), 
+						    pattern: 'log',  // 文件名增加后缀 
+						    alwaysIncludePattern: true   // 是否总是有后缀名 
+						},
+            'request-error':{
                 type: 'dateFile',  
-                filename: path.join(root,'logs','app'), 
-                pattern: '-yyyy-MM-dd.log',  // 文件名增加后缀 
+                filename: path.join(root,'logs',getDate(),'request','error'), 
+                pattern: 'log',  // 文件名增加后缀 
                 alwaysIncludePattern: true   // 是否总是有后缀名 
             },
-            request:{ 
+            'request-warn':{
                 type: 'dateFile',  
-                filename: path.join(root,'logs','request'), 
-                pattern: '-yyyy-MM-dd.log',  // 文件名增加后缀 
+                filename: path.join(root,'logs',getDate(),'request','warn'), 
+                pattern: 'log',  // 文件名增加后缀 
                 alwaysIncludePattern: true   // 是否总是有后缀名 
-            }
+            },
+						'request-info':{
+						    type: 'dateFile',  
+						    filename: path.join(root,'logs',getDate(),'request','info'), 
+						    pattern: 'log',  // 文件名增加后缀 
+						    alwaysIncludePattern: true   // 是否总是有后缀名 
+						}
         },
         categories:{
-            default:{ appenders: ['app'], level: 'info' },
-            request: { appenders: ['request'], level: 'info' }
+            default:{ appenders: ['app-info'], level: 'info' },
+            'request-info': { appenders: ['request-info'], level: 'info' }
         }
     });
-    
-    const loggerApp = log4js.getLogger('app');
-    const loggerRequest = log4js.getLogger('request');
-    rewrite(loggerApp,name);
-    rewrite(loggerRequest,name);
-    return { loggerApp,loggerRequest };
+    const loggerAppError = log4js.getLogger('app-error');
+    const loggerAppWarn = log4js.getLogger('app-warn');
+		const loggerAppInfo = log4js.getLogger('app-info');
+    const requestError = log4js.getLogger('request-error');
+		const requestWarn = log4js.getLogger('request-warn');
+		const requestInfo = log4js.getLogger('request-info');
+		rewrite(loggerAppError,name);
+		rewrite(loggerAppWarn,name);
+    rewrite(loggerAppInfo,name);
+    rewrite(requestError,name);
+		rewrite(requestWarn,name);
+		rewrite(requestInfo,name);
+		
+    return { 
+			appLogger:{
+				error:loggerAppError.error.bind(loggerAppError),
+				warn:loggerAppWarn.warn.bind(loggerAppWarn),
+				info:loggerAppInfo.info.bind(loggerAppInfo)
+			},
+			requestLogger:{
+				error:requestError.error.bind(requestError),
+				Warn:requestWarn.warn.bind(requestWarn),
+				info:requestInfo.info.bind(requestInfo),
+			}
+		};
 }
 
 function rewrite(logger,name){

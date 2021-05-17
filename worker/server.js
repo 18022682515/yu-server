@@ -14,12 +14,12 @@ const rewriteRender = require('./middleware/rewriteRender.js');
 const catchError = require('./middleware/catchError.js');
 const log = require('./middleware/log.js');
 
-module.exports = function(root, config, loggerApp, loggerRequest) {
+module.exports = function(root, config, appLogger,requestLogger) {
 	global.app = new Koa();
 	const router = new koaRouter();
-	app.logger = loggerApp;
+	app.logger = appLogger;
 	app.keys = config.keys || ['ab1234cd1xsdfgf22qe3eg31fg'];
-	app.use(log(loggerRequest));
+	app.use(log(requestLogger));
 	app.use(catchError());
 	if (getType(config.redis) === 'Object') {
 		const redis = require("redis").createClient(config.redis);
