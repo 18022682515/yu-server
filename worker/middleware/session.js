@@ -8,7 +8,17 @@ module.exports = (options,redis) => {
 	return async (ctx, next) => {
 		let keyName = 'session_id';
 		let session_id = ctx.cookies.get(keyName);
-		if (!session_id) {
+		let isRedisKey = null;
+		if(redis){
+			isRedisKey = await new Promise((res,rej)=>{
+				redis.exists(session_id,(err,result)=>{
+					if(err) return rej(err);
+					res(result);
+				});
+			})
+		}
+		let hasKey = redis ? isRedisKey : app.context[session_id];
+		if (!session_id || !hasKey ) {
 			let hash = crypto.createHash('md5');
 			hash.update(`${Date.now()}`);
 			session_id = 'sess_id' + hash.digest('hex');

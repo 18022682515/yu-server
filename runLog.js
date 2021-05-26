@@ -50,7 +50,11 @@ module.exports = (root,name)=>{
 						}
         },
         categories:{
-            default:{ appenders: ['app-info'], level: 'info' },
+            default:{ appenders:['app-error'],level:'error' },
+						'app-warn':{ appenders:['app-warn'],level:'warn' },
+						'app-info':{ appenders: [,'app-info'], level: 'info' },
+						'request-error':{ appenders:['request-error'],level:'error' },
+						'request-warn':{ appenders:['request-warn'],level:'warn' },
             'request-info': { appenders: ['request-info'], level: 'info' }
         }
     });

@@ -53,6 +53,10 @@ module.exports = function(root, config, appLogger,requestLogger) {
 		index: false,
 		path: path.resolve(root, config.static)
 	}));
+	
+	const setRouter = require(path.join(root, 'router/router.js'))
+	setRouter(router);
+	
 	app.use(router.routes()).use(router.allowedMethods());
 
 	render(app, {
@@ -63,9 +67,6 @@ module.exports = function(root, config, appLogger,requestLogger) {
 		debug: false
 	});
 
-	const setRouter = require(path.join(root, 'router/router.js'))
-	setRouter(router);
-	
 	config.https = getType(config.https) === "Object" ? config.https : {};
 	let keyPath = config.https.key || path.resolve(__dirname, '../server.key');
 	let certPath = config.https.cert || path.resolve(__dirname, '../server.cer');

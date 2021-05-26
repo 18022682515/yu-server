@@ -10,6 +10,11 @@ module.exports = function(root) {
 	return new Promise(res=>{
 		const { appLogger,requestLogger } = runLog(root, '工作进程');
 		
+		process.on('uncaughtException', (e)=>{
+		  appLogger.error(e.message);	
+		  process.exitCode = 1;
+		});
+		
 		appLogger.info('启动');
 		
 		const config = require(path.join(root, 'config.js'));
