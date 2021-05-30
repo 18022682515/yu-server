@@ -9,7 +9,7 @@ nodejs服务器框架
 
 3、日志功能（日志以每天日期为一个日志目录名，分为app日志和request日志，日志等级有error、warn、info）;
 
-4、csrf防御（document.cookie中获取，key名：_csrf）;
+4、csrf防御（cookie和session中获取，key名：_csrf）;
 
 5、定时任务模块;
 

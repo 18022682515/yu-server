@@ -8,25 +8,21 @@ module.exports = (options,redis) => {
 	return async (ctx, next) => {
 		let keyName = 'session_id';
 		let session_id = ctx.cookies.get(keyName);
-		let isRedisKey = null;
-		if(redis){
-			isRedisKey = await new Promise((res,rej)=>{
-				redis.exists(session_id,(err,result)=>{
-					if(err) return rej(err);
-					res(result);
-				});
-			})
-		}
-		let hasKey = redis ? isRedisKey : app.context[session_id];
-		if (!session_id || !hasKey ) {
+		
+		if (!session_id ) {
 			let hash = crypto.createHash('md5');
 			hash.update(`${Date.now()}`);
 			session_id = 'sess_id' + hash.digest('hex');
-			if(!redis){
+		}
+		
+		if(!redis){
+			if(!app.context[session_id]){
 				app.context[session_id] = {
 					//服务器自动清理过期session_id对象，以下是session_id对象的有效期
 					maxAge: options.maxAge ? Date.now()+options.maxAge : Date.now()+24*60*60*1000
 				};
+			}else{
+				app.context[session_id].maxAge = options.maxAge ? Date.now()+options.maxAge : Date.now()+24*60*60*1000
 			}
 		}
 		ctx.session = redis ? getRedisSession(redis,session_id): getSession(app.context,session_id);
@@ -39,7 +35,7 @@ module.exports = (options,redis) => {
 function setCookies(ctx, keyName, session_id, options) {
 	options.maxAge = options.maxAge || 24 * 60 * 60 * 1000; // cookie有效时长
 	options.path = options.path || '/'; // 该cookie所在的路径
-	options.httpOnly = options.httpOnly || false; // 前端js是否可以访问cookie
+	options.httpOnly = options.httpOnly || true; // 是否禁止前端js访问cookie
 	options.overwrite = options.overwrite || true; // 如果设置两个相同的key名，是否后者覆盖前者
 	options.signed = false; //是否使用签名
 	options.encrypt = options.encrypt || false; //是否对cookie加密

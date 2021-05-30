@@ -9,7 +9,7 @@ const render = require('koa-ejs');
 const koaBody = require('koa-body');
 const { getType } = require('yu-util');
 const session = require('./middleware/session.js');
-const setToken = require('./middleware/setToken.js');
+const setCsrf = require('./middleware/setCsrf.js');
 const rewriteRender = require('./middleware/rewriteRender.js');
 const catchError = require('./middleware/catchError.js');
 const log = require('./middleware/log.js');
@@ -27,7 +27,7 @@ module.exports = function(root, config, appLogger,requestLogger) {
 	} else {
 		app.use(session());
 	}
-	app.use(setToken());
+	app.use(setCsrf());
 	app.use(rewriteRender());
 
 	const options = {
